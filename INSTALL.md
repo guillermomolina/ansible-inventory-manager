@@ -1,0 +1,1 @@
+pip install git+https://github.com/guillermomolina/ansible-inventory-manager#egg=ansible-inventory-manager
