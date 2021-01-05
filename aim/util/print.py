@@ -12,20 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
- 
-def print_table(table):
+from aim import aim_config
+
+def print_table(table, truncate=True):
+    MAX_COLUMN_LENGTH = aim_config['global']['max_column_length']
     if len(table) == 0:
         return
 
     columns = []
     # initialize columns from first row's keys
     for key in table[0]:
-        if key != 'ociVersion':             
-            columns.append({
-                'key': key,
-                'tittle': key.upper(),
-                'length': len(key)
-            })
+        columns.append({
+            'key': key,
+            'tittle': key.upper(),
+            'length': len(key)
+        })
 
     # adjust columns lenghts to max record sizes
     for column in columns:
@@ -34,6 +35,9 @@ def print_table(table):
             row[column['key']] = value
             column['length'] = max(column['length'], len(value))
 
+    if truncate:
+        for column in columns:
+            column['length'] = min(column['length'], MAX_COLUMN_LENGTH)
 
     # print headers
     strings = []
@@ -45,7 +49,9 @@ def print_table(table):
     for row in table:
         strings = []
         for column in columns:
-            str_format = '{:%s}' % str(column['length'])
             value = row[column['key']]
+            if truncate and len(value) > MAX_COLUMN_LENGTH:
+                value = value[:MAX_COLUMN_LENGTH-3] + '...';
+            str_format = '{:%s}' % str(column['length'])
             strings.append(str_format.format(value))
         print('   '.join(strings))

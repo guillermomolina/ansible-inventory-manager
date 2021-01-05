@@ -19,23 +19,23 @@ from aim.api import Manager
 
 class List:
     @staticmethod
-    def init_parser(host_subparsers, parent_parser):
-        parser = host_subparsers.add_parser('ls',
+    def init_parser(group_subparsers, parent_parser):
+        parser = group_subparsers.add_parser('ls',
             parents=[parent_parser],
             aliases=['ps', 'list'],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-            description='List hosts',
-            help='List hosts')
+            description='List groups',
+            help='List groups')
         parser.add_argument('--no-trunc',
             help='Don\'t truncate output', 
             action='store_true')
 
     def __init__(self, options):
         manager = Manager() 
-        hosts = []
-        for host in manager.inventory.hosts.values():
+        groups = []
+        for group in manager.inventory.groups.values():
             data = {}
-            data['name'] = host.name
-            data['groups'] = ', '.join([host_group.name for host_group in host.groups])
-            hosts.append(data)
-        print_table(hosts, truncate=not options.no_trunc)
+            data['name'] = group.name
+            data['hosts'] = ', '.join([host.name for host in group.hosts])
+            groups.append(data)
+        print_table(groups, truncate=not options.no_trunc)
