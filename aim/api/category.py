@@ -1,4 +1,4 @@
-# Copyright 2020, Guillermo Adrián Molina
+# Copyright 2021, Guillermo Adrián Molina
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,21 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Mutually exclusive host groups
+
 import logging
-from aim.util import Singleton
 
 log = logging.getLogger(__name__)
 
-class Runtime(metaclass=Singleton):
+class Category():
     def __init__(self):
         log.debug('Creating instance of %s()' % type(self).__name__)
-        self.hosts = None
-        self.load()
+        self.name = None
+        self.host_groups = None
 
     def load(self):
         log.debug('Loading instance of %s()' % type(self).__name__)
-        self.hosts = {}
 
     def save(self):
         log.debug('Saving instance of %s()' % type(self).__name__)
-

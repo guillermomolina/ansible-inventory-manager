@@ -42,7 +42,7 @@ class CLI:
     def __init__(self):
         parser = argparse.ArgumentParser(
             formatter_class=CustomFormatter,
-            description='A self-sufficient runtime for containers')
+            description='A self-sufficient inventory for containers')
         parser.add_argument('-v', '--version',
             help='Print version information and quit', 
             action='version',

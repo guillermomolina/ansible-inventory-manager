@@ -15,7 +15,7 @@
 import argparse
 from datetime import datetime, timezone
 from aim.util.print import print_table
-from aim.api import Runtime
+from aim.api import Manager
 
 class List:
     @staticmethod
@@ -31,10 +31,11 @@ class List:
             action='store_true')
 
     def __init__(self, options):
-        runtime = Runtime() 
+        manager = Manager() 
         hosts = []
-        for host in runtime.hosts.values():
+        for host in manager.inventory.hosts.values():
             data = {}
             data['name'] = host.name
+            data['groups'] = ', '.join([host_group.name for host_group in host.groups])
             hosts.append(data)
         print_table(hosts)

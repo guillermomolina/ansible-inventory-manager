@@ -16,7 +16,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-class Host():
+class HostGroup():
     def __init__(self):
         log.debug('Creating instance of %s()' % type(self).__name__)
         self.name = None

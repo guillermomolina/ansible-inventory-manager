@@ -16,7 +16,7 @@
 import argparse
 import logging
 from aim import AIMError
-from aim.api import Runtime
+from aim.api import Manager
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class Remove:
     def __init__(self, options):
         for host_ref in options.host:
             try:
-                Runtime().remove_host(host_ref)
+                Manager().remove_host(host_ref)
             except HostUnknownException:
                 log.error('Host (%s) does not exist' % host_ref)
                 exit(-1)
