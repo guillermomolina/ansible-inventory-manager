@@ -20,6 +20,7 @@ from aim import __version__
 from aim import aim_config
 from .host import Host
 from .group import Group
+from .category import Category
 
 log = logging.getLogger(__name__)
 
@@ -37,8 +38,9 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
 
 class CLI:
     commands = {
-        'host': Host,
-        'group': Group
+        'category': Category,
+        'group': Group,
+        'host': Host
     }
 
     def __init__(self):

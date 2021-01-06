@@ -16,31 +16,26 @@ import argparse
 from datetime import datetime, timezone
 from aim.util.print import print_table
 from aim.api import Manager
-from aim.exceptions import AIMError
 
 class List:
     @staticmethod
-    def init_parser(host_subparsers, parent_parser):
-        parser = host_subparsers.add_parser('ls',
+    def init_parser(category_subparsers, parent_parser):
+        parser = category_subparsers.add_parser('ls',
             parents=[parent_parser],
             aliases=['ps', 'list'],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-            description='List hosts',
-            help='List hosts')
+            description='List categories',
+            help='List categories')
         parser.add_argument('--no-trunc',
             help='Don\'t truncate output', 
             action='store_true')
 
     def __init__(self, options):
         manager = Manager() 
-        hosts = []
-        for host in manager.hosts.values():
+        categories = []
+        for category in manager.categories.values():
             data = {}
-            data['host'] = host.name
-            for category in manager.categories.values():
-                groups = [group for group in category.child_groups if group in host.groups]
-                if len(groups) > 1:
-                    raise AIMError("Too many groups for category " + category.name)
-                data[category.name] = '-' if len(groups) == 0 else groups[0]            
-            hosts.append(data)
-        print_table(hosts, truncate=not options.no_trunc)
+            data['category'] = category.name
+            data['groups'] = ', '.join([group.name for group in category.child_groups])
+            categories.append(data)
+        print_table(categories, truncate=not options.no_trunc)

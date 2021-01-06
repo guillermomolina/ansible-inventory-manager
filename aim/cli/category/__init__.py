@@ -12,18 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-
-log = logging.getLogger(__name__)
-
-class Group():
-    def __init__(self):
-        log.debug('Creating instance of %s()' % type(self).__name__)
-        self.name = None
-        self.group_names = None
-
-    def load(self):
-        log.debug('Loading instance of %s()' % type(self).__name__)
-
-    def save(self):
-        log.debug('Saving instance of %s()' % type(self).__name__)
+from .category import Category

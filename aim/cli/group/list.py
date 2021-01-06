@@ -33,9 +33,9 @@ class List:
     def __init__(self, options):
         manager = Manager() 
         groups = []
-        for group in manager.inventory.groups.values():
+        for group in manager.groups.values():
             data = {}
-            data['name'] = group.name
+            data['group'] = group.name
             data['hosts'] = ', '.join([host.name for host in group.hosts])
             groups.append(data)
         print_table(groups, truncate=not options.no_trunc)

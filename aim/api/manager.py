@@ -26,7 +26,9 @@ log = logging.getLogger(__name__)
 class Manager(metaclass=Singleton):
     def __init__(self):
         log.debug('Creating instance of %s()' % type(self).__name__)
-        self.inventory = None
+        self.hosts = None
+        self.groups = None
+        self.categories = None
         self.variables = None
         self.load()
 
@@ -37,20 +39,26 @@ class Manager(metaclass=Singleton):
         loader = DataLoader()
 
         # create inventory, use path to host config file as source or hosts in a comma separated string
-        self.inventory = InventoryManager(loader=loader, sources='inventory')
+        inventory = InventoryManager(loader=loader, sources='inventory')
 
         # variable manager takes care of merging all the different sources to give you a unified view of variables available in each context
-        self.variables = VariableManager(loader=loader, inventory=self.inventory)
+        #self.variables = VariableManager(loader=loader, inventory=inventory)
 
-    def load2(self):
-        log.debug('Loading instance of %s()' % type(self).__name__)
+        self.categories = {}
+        self.groups = {}
+        for group in inventory.groups.values():
+            if group.name not in ['all', 'ungrouped']: 
+                if len(group.child_groups) != 0:
+                    category_name = group.name
+                    if len(category_name) == 0:
+                        log.error('Category %s has hosts' % category_name)
+                    self.categories[category_name] = group
+                else:
+                    if len(group.hosts) == 0:
+                        log.warning('Group %s is empty' % group.name)
+                    self.groups[group.name] = group
 
-        self.hosts = {}
-        inventory_path = pathlib.Path('inventory')
-        for path in inventory_path.iterdir():
-            if path.is_file():
-                config = configparser.ConfigParser()
-                config.read_file(path.open())
+        self.hosts = inventory.hosts
 
     def save(self):
         log.debug('Saving instance of %s()' % type(self).__name__)
