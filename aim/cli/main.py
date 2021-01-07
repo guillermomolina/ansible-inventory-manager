@@ -18,9 +18,10 @@ import importlib
 import logging
 from aim import __version__
 from aim import aim_config
-from .host import Host
-from .group import Group
-from .category import Category
+from aim.cli.host import Host
+from aim.cli.group import Group
+from aim.cli.category import Category
+from aim.cli.variable import Variable
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +41,8 @@ class CLI:
     commands = {
         'category': Category,
         'group': Group,
-        'host': Host
+        'host': Host,
+        'variable': Variable
     }
 
     def __init__(self):

@@ -18,6 +18,7 @@ from aim.exceptions import AIMError
 from aim.api.host import Host
 from aim.api.group import Group
 from aim.api.category import Category
+from aim.api.variable import Variable
 
 from collections import OrderedDict
 from ansible.inventory.manager import InventoryManager
@@ -40,7 +41,6 @@ def load_host_variables(data_loader, host_name):
         return data_loader.load_from_file(vars_file)
     except:
         return None
-        
 
 class Inventory(metaclass=Singleton):
     def __init__(self):
@@ -49,6 +49,15 @@ class Inventory(metaclass=Singleton):
         self.categories = None
         self.variables = None
         self.load()
+
+    def add_or_set_variables(self, context, variables):
+        if variables:
+            for variable_name, variable_value in variables.items():
+                variable = self.variables.get(variable_name)
+                if not variable:
+                    variable = Variable(variable_name)
+                    self.variables[variable_name] = variable
+                variable.add_value(context, variable_value)  
 
     def load(self):
         log.debug('Loading instance of %s()' % type(self).__name__)
@@ -59,7 +68,8 @@ class Inventory(metaclass=Singleton):
         # create inventory, use path to host config file as source or hosts in a comma separated string
         inventory_manager = InventoryManager(loader=data_loader, sources='inventory')
 
-        self.variables = load_group_variables(data_loader, 'all')
+        self.variables = {}
+        self.add_or_set_variables('all', load_group_variables(data_loader, 'all'))
 
         categories = {}
         for category in inventory_manager.groups.values():
@@ -71,7 +81,8 @@ class Inventory(metaclass=Singleton):
                 groups = {}
                 for group in category.child_groups:
                     variables = load_group_variables(data_loader, group.name)
-                    groups[group.name] = Group(group.name, group.hosts, variables)
+                    self.add_or_set_variables(group.name, variables)
+                    groups[group.name] = Group(group.name, group.hosts)
                 categories[category_name] = Category(category_name, category.priority, groups)
 
         self.categories = OrderedDict(sorted(categories.items(), key=lambda x: x[1].priority))
@@ -87,7 +98,8 @@ class Inventory(metaclass=Singleton):
                 if len(host_groups) == 1:
                     groups[category.name] = category.groups[host_groups[0].name]
             variables = load_host_variables(data_loader, host.name)
-            self.hosts[host.name] = Host(host.name, groups, variables)
+            self.add_or_set_variables(host.name, variables)
+            self.hosts[host.name] = Host(host.name, groups)
 
     def save(self):
         log.debug('Saving instance of %s()' % type(self).__name__)
