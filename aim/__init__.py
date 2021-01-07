@@ -16,8 +16,6 @@ from .version import __version__
 from .exceptions import AIMException, AIMError
 
 aim_config = {
-    'global': {
-        'path': '~/ansible',
-        'max_column_length': 50
-    }
+    'path': '~/ansible',
+    'max_column_length': 50
 }

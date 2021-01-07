@@ -68,7 +68,7 @@ class CLI:
         parser.add_argument('--root', 
             help='root directory for storage',
             metavar='string',
-            default=aim_config['global']['path'])
+            default=aim_config['path'])
 
         oci_subparsers = parser.add_subparsers(
             dest='command',

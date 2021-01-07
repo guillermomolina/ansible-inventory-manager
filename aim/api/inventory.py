@@ -23,6 +23,7 @@ from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
 from ansible.vars.manager import VariableManager
 from collections import OrderedDict
+from aim import aim_config
 from aim.util import Singleton
 from aim.exceptions import AIMError
 
@@ -47,7 +48,7 @@ class Inventory(metaclass=Singleton):
         # variable manager takes care of merging all the different sources to give you a unified view of variables available in each context
         variable_manager = VariableManager(loader=data_loader, inventory=inventory_manager)
 
-        self.categories = OrderedDict()
+        categories = {}
         for category in inventory_manager.groups.values():
             if category.name not in ['all', 'ungrouped'] and len(category.child_groups) != 0:
                 category_name = category.name
@@ -57,7 +58,9 @@ class Inventory(metaclass=Singleton):
                 groups = {}
                 for group in category.child_groups:
                     groups[group.name] = Group(group.name, group.hosts)
-                self.categories[category_name] = Category(category_name, groups)
+                categories[category_name] = Category(category_name, category.priority, groups)
+
+        self.categories = OrderedDict(sorted(categories.items(), key=lambda x: x[1].priority))
 
         self.hosts = {}
         for host in inventory_manager.hosts.values():

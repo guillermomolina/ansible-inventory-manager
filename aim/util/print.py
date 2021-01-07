@@ -15,7 +15,7 @@
 from aim import aim_config
 
 def print_table(table, truncate=True):
-    MAX_COLUMN_LENGTH = aim_config['global']['max_column_length']
+    MAX_COLUMN_LENGTH = aim_config['max_column_length']
     if len(table) == 0:
         return
 

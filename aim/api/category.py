@@ -19,9 +19,10 @@ import logging
 log = logging.getLogger(__name__)
 
 class Category():
-    def __init__(self, name, groups):
+    def __init__(self, name, priority, groups):
         log.debug('Creating instance of %s()' % type(self).__name__)
         self.name = name
+        self.priority = priority
         self.groups = groups
 
     def save(self):
