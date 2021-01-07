@@ -12,28 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .host import Host
-from .group import Group
-from .category import Category
-
-import logging
-import pathlib
-import configparser
-from ansible.inventory.manager import InventoryManager
-from ansible.parsing.dataloader import DataLoader
-from ansible.vars.manager import VariableManager
-from collections import OrderedDict
 from aim import aim_config
 from aim.util import Singleton
 from aim.exceptions import AIMError
+from aim.api.host import Host
+from aim.api.group import Group
+from aim.api.category import Category
 
+from collections import OrderedDict
+from ansible.inventory.manager import InventoryManager
+from ansible.parsing.dataloader import DataLoader
+from ansible.playbook.play import Play
+
+import logging
 log = logging.getLogger(__name__)
+
+def load_group_variables(data_loader, group_name):
+    try:
+        vars_file = 'inventory/group_vars/' + group_name + '.yml'
+        return data_loader.load_from_file(vars_file)
+    except:
+        return None
+
+def load_host_variables(data_loader, host_name):
+    try:
+        vars_file = 'inventory/host_vars/' + host_name + '.yml'
+        return data_loader.load_from_file(vars_file)
+    except:
+        return None
+        
 
 class Inventory(metaclass=Singleton):
     def __init__(self):
         log.debug('Creating instance of %s()' % type(self).__name__)
         self.hosts = None
         self.categories = None
+        self.variables = None
         self.load()
 
     def load(self):
@@ -45,8 +59,7 @@ class Inventory(metaclass=Singleton):
         # create inventory, use path to host config file as source or hosts in a comma separated string
         inventory_manager = InventoryManager(loader=data_loader, sources='inventory')
 
-        # variable manager takes care of merging all the different sources to give you a unified view of variables available in each context
-        variable_manager = VariableManager(loader=data_loader, inventory=inventory_manager)
+        self.variables = load_group_variables(data_loader, 'all')
 
         categories = {}
         for category in inventory_manager.groups.values():
@@ -57,7 +70,8 @@ class Inventory(metaclass=Singleton):
                     raise AIMError()
                 groups = {}
                 for group in category.child_groups:
-                    groups[group.name] = Group(group.name, group.hosts)
+                    variables = load_group_variables(data_loader, group.name)
+                    groups[group.name] = Group(group.name, group.hosts, variables)
                 categories[category_name] = Category(category_name, category.priority, groups)
 
         self.categories = OrderedDict(sorted(categories.items(), key=lambda x: x[1].priority))
@@ -72,7 +86,8 @@ class Inventory(metaclass=Singleton):
                     raise AIMError()               
                 if len(host_groups) == 1:
                     groups[category.name] = category.groups[host_groups[0].name]
-            self.hosts[host.name] = Host(host.name, groups)
+            variables = load_host_variables(data_loader, host.name)
+            self.hosts[host.name] = Host(host.name, groups, variables)
 
     def save(self):
         log.debug('Saving instance of %s()' % type(self).__name__)

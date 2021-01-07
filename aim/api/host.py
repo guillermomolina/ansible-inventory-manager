@@ -17,10 +17,11 @@ import logging
 log = logging.getLogger(__name__)
 
 class Host():
-    def __init__(self, name, groups):
+    def __init__(self, name, groups, variables):
         log.debug('Creating instance of %s()' % type(self).__name__)
         self.name = name
         self.groups = groups
+        self.variables = variables
 
     def save(self):
         log.debug('Saving instance of %s()' % type(self).__name__)
