@@ -15,7 +15,7 @@
 import argparse
 from datetime import datetime, timezone
 from aim.util.print import print_table
-from aim.api import Manager
+from aim.api import Inventory
 
 class List:
     @staticmethod
@@ -31,11 +31,11 @@ class List:
             action='store_true')
 
     def __init__(self, options):
-        manager = Manager() 
+        inventory = Inventory() 
         categories = []
-        for category in manager.categories.values():
+        for category in inventory.categories.values():
             data = {}
             data['category'] = category.name
-            data['groups'] = ', '.join([group.name for group in category.child_groups])
+            data['groups'] = ', '.join([group for group in category.groups.keys()])
             categories.append(data)
         print_table(categories, truncate=not options.no_trunc)

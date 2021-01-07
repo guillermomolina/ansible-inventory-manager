@@ -15,7 +15,7 @@
 import argparse
 from datetime import datetime, timezone
 from aim.util.print import print_table
-from aim.api import Manager
+from aim.api import Inventory
 from aim.exceptions import AIMError
 
 class List:
@@ -32,15 +32,12 @@ class List:
             action='store_true')
 
     def __init__(self, options):
-        manager = Manager() 
+        inventory = Inventory() 
         hosts = []
-        for host in manager.hosts.values():
+        for host in inventory.hosts.values():
             data = {}
             data['host'] = host.name
-            for category in manager.categories.values():
-                groups = [group for group in category.child_groups if group in host.groups]
-                if len(groups) > 1:
-                    raise AIMError("Too many groups for category " + category.name)
-                data[category.name] = '-' if len(groups) == 0 else groups[0]            
+            for category in inventory.categories.values():
+                data[category.name] = host.groups[category.name].name if category.name in host.groups else '-'           
             hosts.append(data)
         print_table(hosts, truncate=not options.no_trunc)
