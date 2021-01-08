@@ -22,8 +22,8 @@ class Variable():
         self.name = name
         self.values = {}
     
-    def add_value(self, group_name, value):
-        self.values[group_name] = value
+    def add_value(self, context, value):
+        self.values[context] = value
 
     def save(self):
         log.debug('Saving instance of %s()' % type(self).__name__)

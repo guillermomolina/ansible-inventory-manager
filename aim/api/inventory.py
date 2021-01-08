@@ -45,7 +45,9 @@ def load_host_variables(data_loader, host_name):
 class Inventory(metaclass=Singleton):
     def __init__(self):
         log.debug('Creating instance of %s()' % type(self).__name__)
+        self.type = 'INVENTORY'
         self.hosts = None
+        self.name = 'all'
         self.categories = None
         self.variables = None
         self.load()
@@ -69,37 +71,43 @@ class Inventory(metaclass=Singleton):
         inventory_manager = InventoryManager(loader=data_loader, sources='inventory')
 
         self.variables = {}
-        self.add_or_set_variables('all', load_group_variables(data_loader, 'all'))
+        self.add_or_set_variables(self, load_group_variables(data_loader, 'all'))
 
         categories = {}
-        for category in inventory_manager.groups.values():
-            if category.name not in ['all', 'ungrouped'] and len(category.child_groups) != 0:
-                category_name = category.name
-                if len(category_name) == 0:
-                    log.error('Category %s has hosts' % category_name)
+        for ansible_category in inventory_manager.groups.values():
+            if ansible_category.name not in ['all', 'ungrouped'] and len(ansible_category.child_groups) != 0:
+                if len(ansible_category.name) == 0:
+                    log.error('Category %s has hosts' % ansible_category.name)
                     raise AIMError()
+
                 groups = {}
-                for group in category.child_groups:
-                    variables = load_group_variables(data_loader, group.name)
-                    self.add_or_set_variables(group.name, variables)
-                    groups[group.name] = Group(group.name, group.hosts)
-                categories[category_name] = Category(category_name, category.priority, groups)
+                for ansible_group in ansible_category.child_groups:
+                    variables = load_group_variables(data_loader, ansible_group.name)
+                    group = Group(ansible_group.name, ansible_group.hosts, variables)
+                    self.add_or_set_variables(group, variables)
+                    groups[group.name] = group
+                
+                variables = load_group_variables(data_loader, ansible_category.name)
+                category = Category(ansible_category.name, ansible_category.priority, groups, variables)
+                self.add_or_set_variables(category, variables)
+                categories[category.name] = category
 
         self.categories = OrderedDict(sorted(categories.items(), key=lambda x: x[1].priority))
 
         self.hosts = {}
-        for host in inventory_manager.hosts.values():
+        for ansible_host in inventory_manager.hosts.values():
             groups = {}
             for category in self.categories.values():
-                host_groups = [host_group for host_group in host.groups if host_group.name in category.groups.keys()]
+                host_groups = [host_group for host_group in ansible_host.groups if host_group.name in category.groups.keys()]
                 if len(host_groups) > 1:
-                    log.error('Host %s is in more than one group of category %s' % (host.name, category.name))
+                    log.error('Host %s is in more than one group of category %s' % (ansible_host.name, category.name))
                     raise AIMError()               
                 if len(host_groups) == 1:
                     groups[category.name] = category.groups[host_groups[0].name]
-            variables = load_host_variables(data_loader, host.name)
-            self.add_or_set_variables(host.name, variables)
-            self.hosts[host.name] = Host(host.name, groups)
+            variables = load_host_variables(data_loader, ansible_host.name)
+            host = Host(ansible_host.name, groups, variables)
+            self.add_or_set_variables(host, variables)
+            self.hosts[host.name] = host
 
     def save(self):
         log.debug('Saving instance of %s()' % type(self).__name__)

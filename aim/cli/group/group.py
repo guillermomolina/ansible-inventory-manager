@@ -18,6 +18,7 @@ import pathlib
 
 from .list import List
 from .remove import Remove
+from aim.util.argparse import get_subparser_aliases
 
 class Group:
     commands = {
@@ -26,22 +27,24 @@ class Group:
     }
 
     @staticmethod
-    def init_parser(oci_subparsers):
+    def init_parser(parent_subparsers):
         parent_parser = argparse.ArgumentParser(add_help=False)
-        group_parser = oci_subparsers.add_parser('group',
+        parser = parent_subparsers.add_parser('group',
             parents=[parent_parser],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             description='Manage groups',
             help='Manage groups')
 
-        group_subparsers = group_parser.add_subparsers(
+        subparsers = parser.add_subparsers(
             dest='subcommand',
             metavar='COMMAND',
             required=True)
 
         for subcommand in Group.commands.values():
-            subcommand.init_parser(group_subparsers, parent_parser)
+            subcommand.init_parser(subparsers, parent_parser)
+        
+        Group.aliases = get_subparser_aliases(parser, Group.commands)
 
     def __init__(self, options):
-        command = Group.commands[options.subcommand]
+        command = Group.aliases[options.subcommand]
         command(options)

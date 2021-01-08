@@ -20,10 +20,10 @@ from aim.exceptions import AIMError
 
 class List:
     @staticmethod
-    def init_parser(host_subparsers, parent_parser):
-        parser = host_subparsers.add_parser('ls',
+    def init_parser(parent_subparsers, parent_parser):
+        parser = parent_subparsers.add_parser('ls',
             parents=[parent_parser],
-            aliases=['ps', 'list'],
+            aliases=['list'],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             description='List hosts',
             help='List hosts')

@@ -22,8 +22,8 @@ log = logging.getLogger(__name__)
 
 class Remove:
     @staticmethod
-    def init_parser(image_subparsers, parent_parser):
-        parser = image_subparsers.add_parser('rm',
+    def init_parser(parent_subparsers, parent_parser):
+        parser = parent_subparsers.add_parser('rm',
             parents=[parent_parser],
             aliases=['remove'],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,

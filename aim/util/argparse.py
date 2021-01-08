@@ -12,17 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
+def get_subparser_aliases(parser, commands):
+    dest = 'subcommand'
+    out = {}
+    prog_str = parser.prog
+    dest_dict = {a.dest: a for a in parser._actions}
+    try:
+        choices = dest_dict.get(dest).choices
+    except AttributeError:
+        raise AttributeError(f'The parser "{parser}" has no subparser with a `dest` of "{dest}"')
 
-log = logging.getLogger(__name__)
-
-class Host():
-    def __init__(self, name, groups, variables):
-        log.debug('Creating instance of %s()' % type(self).__name__)
-        self.type = 'HOST'
-        self.name = name
-        self.groups = groups
-        self.variables = variables
-
-    def save(self):
-        log.debug('Saving instance of %s()' % type(self).__name__)
+    for k, v in choices.items():
+        clean_v = v.prog.replace(prog_str, '', 1).strip()
+        out[k] = commands[clean_v]
+    
+    return out

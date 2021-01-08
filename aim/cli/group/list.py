@@ -19,10 +19,10 @@ from aim.api import Inventory
 
 class List:
     @staticmethod
-    def init_parser(group_subparsers, parent_parser):
-        parser = group_subparsers.add_parser('ls',
+    def init_parser(parent_subparsers, parent_parser):
+        parser = parent_subparsers.add_parser('ls',
             parents=[parent_parser],
-            aliases=['ps', 'list'],
+            aliases=['list'],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             description='List groups',
             help='List groups')

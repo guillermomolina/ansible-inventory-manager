@@ -72,13 +72,13 @@ class CLI:
             metavar='string',
             default=aim_config['path'])
 
-        oci_subparsers = parser.add_subparsers(
+        subparsers = parser.add_subparsers(
             dest='command',
             metavar='COMMAND',
             required=True)
 
         for command in CLI.commands.values():
-            command.init_parser(oci_subparsers)
+            command.init_parser(subparsers)
  
         options = parser.parse_args()
 

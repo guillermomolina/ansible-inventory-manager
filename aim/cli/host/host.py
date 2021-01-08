@@ -16,8 +16,9 @@ import subprocess
 import argparse
 import pathlib
 
-from .list import List
-from .remove import Remove
+from aim.cli.host.list import List
+from aim.cli.host.remove import Remove
+from aim.util.argparse import get_subparser_aliases
 
 class Host:
     commands = {
@@ -26,22 +27,24 @@ class Host:
     }
 
     @staticmethod
-    def init_parser(oci_subparsers):
+    def init_parser(parent_subparsers):
         parent_parser = argparse.ArgumentParser(add_help=False)
-        host_parser = oci_subparsers.add_parser('host',
+        parser = parent_subparsers.add_parser('host',
             parents=[parent_parser],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             description='Manage hosts',
             help='Manage hosts')
 
-        host_subparsers = host_parser.add_subparsers(
+        subparsers = parser.add_subparsers(
             dest='subcommand',
             metavar='COMMAND',
             required=True)
 
         for subcommand in Host.commands.values():
-            subcommand.init_parser(host_subparsers, parent_parser)
+            subcommand.init_parser(subparsers, parent_parser)
+        
+        Host.aliases = get_subparser_aliases(parser, Host.commands)
 
     def __init__(self, options):
-        command = Host.commands[options.subcommand]
+        command = Host.aliases[options.subcommand]
         command(options)

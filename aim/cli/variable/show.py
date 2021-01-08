@@ -18,16 +18,16 @@ from aim.util.print import print_table
 from aim.api import Inventory
 from aim.exceptions import AIMError
 
-class List:
-    
+class Show:
+
     @staticmethod
     def init_parser(parent_subparsers, parent_parser):
-        parser = parent_subparsers.add_parser('ls',
+        parser = parent_subparsers.add_parser('show',
             parents=[parent_parser],
-            aliases=['ps', 'list'],
+            aliases=['view'],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-            description='List variables',
-            help='List variables')
+            description='Show variable',
+            help='Show variable')
         parser.add_argument('--no-trunc',
             help='Don\'t truncate output', 
             action='store_true')

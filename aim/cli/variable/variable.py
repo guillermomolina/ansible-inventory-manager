@@ -16,32 +16,37 @@ import subprocess
 import argparse
 import pathlib
 
-from .list import List
-from .remove import Remove
+from aim.util.argparse import get_subparser_aliases
+from aim.cli.variable.list import List
+from aim.cli.variable.show import Show
+from aim.cli.variable.remove import Remove
 
 class Variable:
-    commands = {
-        'ls': List,
+    comands = {
+        'ls': List, 
+        'show': Show, 
         'rm': Remove
     }
 
     @staticmethod
-    def init_parser(oci_subparsers):
+    def init_parser(parent_subparsers):
         parent_parser = argparse.ArgumentParser(add_help=False)
-        variable_parser = oci_subparsers.add_parser('variable',
+        parser = parent_subparsers.add_parser('variable',
             parents=[parent_parser],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             description='Manage variables',
             help='Manage variables')
 
-        variable_subparsers = variable_parser.add_subparsers(
+        subparser = parser.add_subparsers(
             dest='subcommand',
             metavar='COMMAND',
             required=True)
 
-        for subcommand in Variable.commands.values():
-            subcommand.init_parser(variable_subparsers, parent_parser)
+        for subcommand in Variable.comands.values():
+            subcommand.init_parser(subparser, parent_parser)
+        
+        Variable.aliases = get_subparser_aliases(parser, Variable.comands)
 
     def __init__(self, options):
-        command = Variable.commands[options.subcommand]
+        command = Variable.aliases[options.subcommand]
         command(options)
