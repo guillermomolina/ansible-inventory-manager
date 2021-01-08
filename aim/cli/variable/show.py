@@ -64,4 +64,4 @@ class Show:
                 data['name'] = context.name
                 data['value'] = value
                 variables.append(data)
-            print_table(variables, truncate=not options.no_trunc)
+            print_table(variables, truncate=not options.no_trunc, identation=1)

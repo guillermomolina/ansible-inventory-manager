@@ -14,7 +14,7 @@
 
 from aim import aim_config
 
-def print_table(table, truncate=True):
+def print_table(table, truncate=True, separation=2, identation=0):
     MAX_COLUMN_LENGTH = aim_config['max_column_length']
     if len(table) == 0:
         return
@@ -38,20 +38,22 @@ def print_table(table, truncate=True):
     if truncate:
         for column in columns:
             column['length'] = min(column['length'], MAX_COLUMN_LENGTH)
+    
+    separation_string = ' ' * separation
 
     # print headers
-    strings = []
+    strings = [''] * identation if identation > 0 else []
     for column in columns:
         str_format = '{:%s}' % str(column['length'])
         strings.append(str_format.format(column['tittle']))
-    print('   '.join(strings))
+    print(separation_string.join(strings))
 
     for row in table:
-        strings = []
+        strings = [''] * identation if identation > 0 else []
         for column in columns:
             value = row[column['key']]
             if truncate and len(value) > MAX_COLUMN_LENGTH:
                 value = value[:MAX_COLUMN_LENGTH-3] + '...';
             str_format = '{:%s}' % str(column['length'])
             strings.append(str_format.format(value))
-        print('   '.join(strings))
+        print(separation_string.join(strings))
