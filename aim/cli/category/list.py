@@ -22,7 +22,7 @@ class List:
     def init_parser(category_subparsers, parent_parser):
         parser = category_subparsers.add_parser('ls',
             parents=[parent_parser],
-            aliases=['ps', 'list'],
+            aliases=['list'],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             description='List categories',
             help='List categories')

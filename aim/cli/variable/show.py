@@ -24,13 +24,17 @@ class Show:
     def init_parser(parent_subparsers, parent_parser):
         parser = parent_subparsers.add_parser('show',
             parents=[parent_parser],
-            aliases=['view'],
+            aliases=['view', 'inspect'],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             description='Show variable',
             help='Show variable')
         parser.add_argument('--no-trunc',
             help='Don\'t truncate output', 
             action='store_true')
+        parser.add_argument('variable',
+            nargs='+', 
+            metavar='VARIABLE',
+            help='Name of the variable to show')
 
     def alternative(self, options):
         inventory = Inventory() 
@@ -49,12 +53,15 @@ class Show:
     def __init__(self, options):
         inventory = Inventory() 
         variables = []
-        for variable in inventory.variables.values():
+        for variable_name in options.variable:
+            variable = inventory.variables.get(variable_name)
+            if not variable:
+                raise AIMError('Unknown variable ' + variable_name)
+            print('VARIABLE: ' + variable_name)
             for context, value in variable.values.items():
                 data = {}
-                data['variable'] = variable.name
                 data['context'] = context.type
                 data['name'] = context.name
                 data['value'] = value
                 variables.append(data)
-        print_table(variables, truncate=not options.no_trunc)
+            print_table(variables, truncate=not options.no_trunc)

@@ -24,37 +24,20 @@ class List:
     def init_parser(parent_subparsers, parent_parser):
         parser = parent_subparsers.add_parser('ls',
             parents=[parent_parser],
-            aliases=['ps', 'list'],
+            aliases=['list'],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             description='List variables',
             help='List variables')
         parser.add_argument('--no-trunc',
             help='Don\'t truncate output', 
             action='store_true')
-
-    def alternative(self, options):
-        inventory = Inventory() 
-        variables = []
-        for variable in inventory.variables.values():
-            for category in inventory.categories.values():
-                for group in category.groups.values():
-                    data = {}
-                    data['variable'] = variable.name
-                    data['category'] = category.name
-                    data['group'] = group.name
-                    data['value'] = variable.values.get(group.name, '-')
-                    variables.append(data)
-        print_table(variables, truncate=not options.no_trunc)
         
     def __init__(self, options):
         inventory = Inventory() 
         variables = []
         for variable in inventory.variables.values():
-            for context, value in variable.values.items():
-                data = {}
-                data['variable'] = variable.name
-                data['context'] = context.type
-                data['name'] = context.name
-                data['value'] = value
-                variables.append(data)
+            data = {}
+            data['variable'] = variable.name
+            data['contexts'] = ', '.join([context.name for context in variable.values.keys()])
+            variables.append(data)
         print_table(variables, truncate=not options.no_trunc)
