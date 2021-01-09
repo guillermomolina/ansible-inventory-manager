@@ -17,12 +17,19 @@ import logging
 log = logging.getLogger(__name__)
 
 class Host():
-    def __init__(self, name, groups, variables):
-        log.debug('Creating instance of %s()' % type(self).__name__)
+    def __init__(self, name, groups, variables, modified=False):
+        log.debug('Creating instance %s("%s")' % (type(self).__name__, name))
         self.type = 'HOST'
         self.name = name
         self.groups = groups
         self.variables = variables
-
+        self.modified = modified
+        self.removed = False
+        
     def save(self):
-        log.debug('Saving instance of %s()' % type(self).__name__)
+        if self.removed:
+            log.debug('Removing instance %s("%s")' % (type(self).__name__, self.name))
+
+        elif self.modified:
+            log.debug('Saving instance %s("%s")' % (type(self).__name__, self.name))
+

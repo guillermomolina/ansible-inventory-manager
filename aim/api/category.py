@@ -20,12 +20,21 @@ log = logging.getLogger(__name__)
 
 class Category():
     def __init__(self, name, priority, groups, variables):
-        log.debug('Creating instance of %s()' % type(self).__name__)
+        log.debug('Creating instance %s("%s")' % (type(self).__name__, name))
         self.type = 'CATEGORY'
         self.name = name
         self.priority = priority
         self.groups = groups
         self.variables = variables
+        self.modified = False
+        self.removed = False
 
     def save(self):
-        log.debug('Saving instance of %s()' % type(self).__name__)
+        if self.removed:
+            log.debug('Removing instance %s("%s")' % (type(self).__name__, self.name))
+
+        elif self.modified:
+            log.debug('Saving instance %s("%s")' % (type(self).__name__, self.name))
+
+        for group in self.groups.values():
+            group.save()

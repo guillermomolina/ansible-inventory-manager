@@ -16,7 +16,8 @@
 import argparse
 import logging
 from aim import AIMError
-from aim.api import Manager
+from aim.api import Inventory
+from aim.exceptions import AIMException
 
 log = logging.getLogger(__name__)
 
@@ -34,14 +35,11 @@ class Remove:
             metavar='HOST',
             help='Name of the host to remove')
  
-    def __init__(self, options):
-        for host_ref in options.host:
+    def __init__(self, inventory, options):
+        for host_name in options.host:
             try:
-                Manager().remove_host(host_ref)
-            except HostUnknownException:
-                log.error('Host (%s) does not exist' % host_ref)
-                exit(-1)
+                inventory.hosts_remove(host_name)
+            except AIMException as e:
+                log.warning(e.message)
             except AIMError as e:
                 raise e
-                log.error('Could not remove host (%s)' % host_ref)
-                exit(-1)

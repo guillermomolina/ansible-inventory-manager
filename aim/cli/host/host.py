@@ -17,12 +17,14 @@ import argparse
 import pathlib
 
 from aim.cli.host.list import List
+from aim.cli.host.add import Add
 from aim.cli.host.remove import Remove
 from aim.util.argparse import get_subparser_aliases
 
 class Host:
     commands = {
         'ls': List,
+        'add': Add,
         'rm': Remove
     }
 
@@ -45,6 +47,6 @@ class Host:
         
         Host.aliases = get_subparser_aliases(parser, Host.commands)
 
-    def __init__(self, options):
+    def __init__(self, inventory, options):
         command = Host.aliases[options.subcommand]
-        command(options)
+        command(inventory, options)

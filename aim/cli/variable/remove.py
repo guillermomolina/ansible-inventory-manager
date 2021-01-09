@@ -16,7 +16,7 @@
 import argparse
 import logging
 from aim import AIMError
-from aim.api import Manager
+from aim.api import Inventory
 
 log = logging.getLogger(__name__)
 
@@ -35,10 +35,10 @@ class Remove:
             metavar='VARIABLE',
             help='Name of the variable to remove')
  
-    def __init__(self, options):
+    def __init__(self, inventory, options):
         for variable_ref in options.variable:
             try:
-                Manager().remove_variable(variable_ref)
+                Inventory().remove_variable(variable_ref)
             except VariableUnknownException:
                 log.error('Variable (%s) does not exist' % variable_ref)
                 exit(-1)

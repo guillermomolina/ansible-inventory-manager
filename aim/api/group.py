@@ -18,11 +18,17 @@ log = logging.getLogger(__name__)
 
 class Group():
     def __init__(self, name, hosts, variables):
-        log.debug('Creating instance of %s()' % type(self).__name__)
+        log.debug('Creating instance %s("%s")' % (type(self).__name__, name))
         self.type = 'GROUP'
         self.name = name
         self.hosts = hosts
         self.variables = variables
+        self.modified = False
+        self.removed = False
 
     def save(self):
-        log.debug('Saving instance of %s()' % type(self).__name__)
+        if self.removed:
+            log.debug('Removing instance %s("%s")' % (type(self).__name__, self.name))
+
+        elif self.modified:
+            log.debug('Saving instance %s("%s")' % (type(self).__name__, self.name))

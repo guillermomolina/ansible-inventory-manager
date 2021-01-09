@@ -32,8 +32,7 @@ class List:
             help='Don\'t truncate output', 
             action='store_true')
         
-    def __init__(self, options):
-        inventory = Inventory() 
+    def __init__(self, inventory, options):
         variables = []
         for variable in inventory.variables.values():
             data = {}

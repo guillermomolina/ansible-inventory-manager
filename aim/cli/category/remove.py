@@ -16,7 +16,7 @@
 import argparse
 import logging
 from aim import AIMError
-from aim.api import Manager
+from aim.api import Inventory
 
 log = logging.getLogger(__name__)
 
@@ -34,10 +34,10 @@ class Remove:
             metavar='CATEGORY',
             help='Name of the category to remove')
  
-    def __init__(self, options):
+    def __init__(self, inventory, options):
         for category_ref in options.category:
             try:
-                Manager().remove_category(category_ref)
+                Inventory().remove_category(category_ref)
             except CategoryUnknownException:
                 log.error('Category (%s) does not exist' % category_ref)
                 exit(-1)

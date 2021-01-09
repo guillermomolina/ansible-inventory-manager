@@ -36,8 +36,7 @@ class Show:
             metavar='VARIABLE',
             help='Name of the variable to show')
 
-    def alternative(self, options):
-        inventory = Inventory() 
+    def alternative(self,inventory, options):
         variables = []
         for variable in inventory.variables.values():
             for category in inventory.categories.values():
@@ -50,8 +49,7 @@ class Show:
                     variables.append(data)
         print_table(variables, truncate=not options.no_trunc)
         
-    def __init__(self, options):
-        inventory = Inventory() 
+    def __init__(self, inventory, options):
         variables = []
         for variable_name in options.variable:
             variable = inventory.variables.get(variable_name)

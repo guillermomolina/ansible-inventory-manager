@@ -47,6 +47,6 @@ class Variable:
         
         Variable.aliases = get_subparser_aliases(parser, Variable.comands)
 
-    def __init__(self, options):
+    def __init__(self, inventory, options):
         command = Variable.aliases[options.subcommand]
-        command(options)
+        command(inventory, options)

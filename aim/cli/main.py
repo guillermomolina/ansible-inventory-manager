@@ -22,6 +22,8 @@ from aim.cli.host import Host
 from aim.cli.group import Group
 from aim.cli.category import Category
 from aim.cli.variable import Variable
+from aim.api.inventory import Inventory
+from aim.exceptions import AIMException
 
 log = logging.getLogger(__name__)
 
@@ -67,9 +69,9 @@ class CLI:
         parser.add_argument('-D', '--debug',
             help='Enable debug mode', 
             action='store_true')
-        parser.add_argument('--root', 
-            help='root directory for storage',
-            metavar='string',
+        parser.add_argument('-i', '--inventory', 
+            help='inventory root path',
+            metavar='path',
             default=aim_config['path'])
 
         subparsers = parser.add_subparsers(
@@ -90,8 +92,14 @@ class CLI:
             log.info("Waiting for IDE to attach...")
             ptvsd.wait_for_attach()
 
-        command = CLI.commands[options.command]
-        command(options)
+        try:
+            inventory = Inventory(options.inventory)
+            command = CLI.commands[options.command]
+            command(inventory, options)
+            inventory.save()
+        except AIMException as e:
+            log.error(e.message)
+            exit(-1)
 
 def main():
     CLI()

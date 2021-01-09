@@ -14,6 +14,8 @@
 
 from aim import aim_config
 
+# TODO: use from prettytable import PrettyTable ?
+
 def print_table(table, truncate=True, separation=2, identation=0):
     MAX_COLUMN_LENGTH = aim_config['max_column_length']
     if len(table) == 0:

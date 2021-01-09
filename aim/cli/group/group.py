@@ -45,6 +45,6 @@ class Group:
         
         Group.aliases = get_subparser_aliases(parser, Group.commands)
 
-    def __init__(self, options):
+    def __init__(self, inventory, options):
         command = Group.aliases[options.subcommand]
-        command(options)
+        command(inventory, options)

@@ -14,7 +14,10 @@
 # limitations under the License.
 
 class AIMException(Exception):
-    pass
+    def __init__(self, message="Ansible inventory manager exception"):
+        self.message = message
+        super().__init__(self.message)
 
 class AIMError(AIMException):
-    pass
+    def __init__(self, message="Ansible inventory manager fatal error"):
+        super().__init__(self.message)

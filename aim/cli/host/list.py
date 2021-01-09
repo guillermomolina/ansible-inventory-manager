@@ -31,8 +31,7 @@ class List:
             help='Don\'t truncate output', 
             action='store_true')
 
-    def __init__(self, options):
-        inventory = Inventory() 
+    def __init__(self, inventory, options):
         hosts = []
         for host in inventory.hosts.values():
             data = {}

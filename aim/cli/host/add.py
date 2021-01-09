@@ -20,28 +20,18 @@ from aim.api import Inventory
 
 log = logging.getLogger(__name__)
 
-class Remove:
+class Add:
     @staticmethod
     def init_parser(parent_subparsers, parent_parser):
-        parser = parent_subparsers.add_parser('rm',
+        parser = parent_subparsers.add_parser('add',
             parents=[parent_parser],
-            aliases=['remove'],
+            aliases=['create'],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-            description='Remove one or more groups',
-            help='Remove one or more groups')
-        parser.add_argument('group',
-            nargs='+', 
-            metavar='GROUP',
-            help='Name of the group to remove')
+            description='Add a new host',
+            help='Add a new host')
+        parser.add_argument('host',
+            metavar='HOST',
+            help='Name of the host to add')
  
     def __init__(self, inventory, options):
-        for group_ref in options.group:
-            try:
-                Inventory().remove_group(group_ref)
-            except GroupUnknownException:
-                log.error('Group (%s) does not exist' % group_ref)
-                exit(-1)
-            except AIMError as e:
-                raise e
-                log.error('Could not remove group (%s)' % group_ref)
-                exit(-1)
+        inventory.hosts_add(options.host, {}, {})

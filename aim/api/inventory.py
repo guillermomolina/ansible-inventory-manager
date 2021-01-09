@@ -14,7 +14,7 @@
 
 from aim import aim_config
 from aim.util import Singleton
-from aim.exceptions import AIMError
+from aim.exceptions import AIMError, AIMException
 from aim.api.host import Host
 from aim.api.group import Group
 from aim.api.category import Category
@@ -26,6 +26,7 @@ from ansible.parsing.dataloader import DataLoader
 from ansible.playbook.play import Play
 
 import logging
+from pathlib import Path
 log = logging.getLogger(__name__)
 
 def load_group_variables(data_loader, group_name):
@@ -43,13 +44,20 @@ def load_host_variables(data_loader, host_name):
         return None
 
 class Inventory(metaclass=Singleton):
-    def __init__(self):
-        log.debug('Creating instance of %s()' % type(self).__name__)
+    def __init__(self, path=None):
+        log.debug('Creating instance %s()' % type(self).__name__)
         self.type = 'INVENTORY'
-        self.hosts = None
         self.name = 'all'
+        self.hosts = None
         self.categories = None
         self.variables = None
+        self.modified = None
+
+        if path:
+            self.path = Path(path)
+        else:
+            self.path = Path(aim_config['path'])
+
         self.load()
 
     def add_or_set_variables(self, context, variables):
@@ -62,13 +70,14 @@ class Inventory(metaclass=Singleton):
                 variable.add_value(context, variable_value)  
 
     def load(self):
-        log.debug('Loading instance of %s()' % type(self).__name__)
+        log.debug('Loading instance %s()' % type(self).__name__)        
+        self.modified = False
 
         # Takes care of finding and reading yaml, json and ini files
         data_loader = DataLoader()
 
         # create inventory, use path to host config file as source or hosts in a comma separated string
-        inventory_manager = InventoryManager(loader=data_loader, sources='inventory')
+        inventory_manager = InventoryManager(loader=data_loader, sources=str(self.path))
 
         self.variables = {}
         self.add_or_set_variables(self, load_group_variables(data_loader, 'all'))
@@ -110,5 +119,34 @@ class Inventory(metaclass=Singleton):
             self.hosts[host.name] = host
 
     def save(self):
-        log.debug('Saving instance of %s()' % type(self).__name__)
+        if self.modified:
+            log.debug('Saving instance %s()' % type(self).__name__)
+            inventory_all_path = self.path / 'all'
+            with inventory_all_path.open(mode='w', encoding='utf-8') as f:
+                for host in self.hosts.values():
+                    if not host.removed:
+                        f.write(host.name)
+                        f.write('\n')
+
+        for category in self.categories.values():
+            category.save()
+        
+        for host in self.hosts.values():
+            host.save()
+
+    def hosts_add(self, host_name, groups, variables):
+        if host_name in self.hosts:
+            raise AIMException('Host %s already exists, can not add' % host_name)
+        host = Host(host_name, groups, variables, modified=True)
+        self.add_or_set_variables(host, variables)
+        self.hosts[host.name] = host
+        self.modified = True
+
+    def hosts_remove(self, host_name):
+        host = self.hosts.get(host_name)
+        if not host:
+            raise AIMException('Host %s does not exist' % host_name)
+
+        self.modified = True
+        host.removed = True
 

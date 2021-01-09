@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 class Variable():
     def __init__(self, name):
-        log.debug('Creating instance of %s()' % type(self).__name__)
+        log.debug('Creating instance %s("%s")' % (type(self).__name__, name))
         self.name = name
         self.values = {}
     
@@ -26,4 +26,4 @@ class Variable():
         self.values[context] = value
 
     def save(self):
-        log.debug('Saving instance of %s()' % type(self).__name__)
+        log.debug('Saving instance %s("%s")' % (type(self).__name__, self.name))

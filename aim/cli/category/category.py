@@ -45,6 +45,6 @@ class Category:
         
         Category.aliases = get_subparser_aliases(parser, Category.commands)
 
-    def __init__(self, options):
+    def __init__(self, inventory, options):
         command = Category.aliases[options.subcommand]
-        command(options)
+        command(inventory, options)

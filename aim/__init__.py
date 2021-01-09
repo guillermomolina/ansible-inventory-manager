@@ -16,6 +16,6 @@ from .version import __version__
 from .exceptions import AIMException, AIMError
 
 aim_config = {
-    'path': '~/ansible',
+    'path': './inventory',
     'max_column_length': 50
 }
