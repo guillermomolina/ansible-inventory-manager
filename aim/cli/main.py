@@ -51,7 +51,7 @@ class CLI:
         parser = argparse.ArgumentParser(
             formatter_class=CustomFormatter,
             description='A self-sufficient inventory for containers')
-        parser.add_argument('-v', '--version',
+        parser.add_argument('-V', '--version',
             help='Print version information and quit', 
             action='version',
             version='%(prog)s version ' + __version__)
@@ -64,15 +64,15 @@ class CLI:
                 'error',
                 'critical'
             ],
-            metavar='string',
+            metavar='LOG_LEVEL',
             default='info')
         parser.add_argument('-D', '--debug',
             help='Enable debug mode', 
             action='store_true')
         parser.add_argument('-i', '--inventory', 
             help='inventory root path',
-            metavar='path',
-            default=aim_config['path'])
+            metavar='INVENTORY_PATH',
+            default=aim_config['inventory_path'])
 
         subparsers = parser.add_subparsers(
             dest='command',
@@ -91,9 +91,12 @@ class CLI:
             ptvsd.enable_attach()
             log.info("Waiting for IDE to attach...")
             ptvsd.wait_for_attach()
+    
+        if options.inventory:
+            aim_config['inventory_path'] = options.inventory
 
         try:
-            inventory = Inventory(options.inventory)
+            inventory = Inventory()
             command = CLI.commands[options.command]
             command(inventory, options)
             inventory.save()

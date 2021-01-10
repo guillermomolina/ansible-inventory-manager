@@ -44,7 +44,7 @@ def load_host_variables(data_loader, host_name):
         return None
 
 class Inventory(metaclass=Singleton):
-    def __init__(self, path=None):
+    def __init__(self):
         log.debug('Creating instance %s()' % type(self).__name__)
         self.type = 'INVENTORY'
         self.name = 'all'
@@ -52,11 +52,6 @@ class Inventory(metaclass=Singleton):
         self.categories = None
         self.variables = None
         self.modified = None
-
-        if path:
-            self.path = Path(path)
-        else:
-            self.path = Path(aim_config['path'])
 
         self.load()
 
@@ -76,8 +71,9 @@ class Inventory(metaclass=Singleton):
         # Takes care of finding and reading yaml, json and ini files
         data_loader = DataLoader()
 
+        inventory_path = aim_config['inventory_path']
         # create inventory, use path to host config file as source or hosts in a comma separated string
-        inventory_manager = InventoryManager(loader=data_loader, sources=str(self.path))
+        inventory_manager = InventoryManager(loader=data_loader, sources=str(inventory_path))
 
         self.variables = {}
         self.add_or_set_variables(self, load_group_variables(data_loader, 'all'))
@@ -121,7 +117,7 @@ class Inventory(metaclass=Singleton):
     def save(self):
         if self.modified:
             log.debug('Saving instance %s()' % type(self).__name__)
-            inventory_all_path = self.path / 'all'
+            inventory_all_path = Path(aim_config['inventory_path'], 'all')
             with inventory_all_path.open(mode='w', encoding='utf-8') as f:
                 for host in self.hosts.values():
                     if not host.removed:

@@ -14,6 +14,8 @@
 
 import logging
 from aim.exceptions import AIMError, AIMException
+from aim import aim_config
+from pathlib import Path
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +30,7 @@ class Group():
         self.removed = False
 
     def save(self):
-        group_path = self.path / self.name
+        group_path = Path(aim_config['inventory_path'], self.name)
         if self.removed:
             log.debug('Removing instance %s("%s")' % (type(self).__name__, self.name))
             group_path.unlink()
