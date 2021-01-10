@@ -133,14 +133,34 @@ class Inventory(metaclass=Singleton):
         
         for host in self.hosts.values():
             host.save()
+    
+    def group_get(self, group_name):
+        for category in self.categories.values():
+            group = category.groups.get(group_name)
+            if group:
+                return group
+        raise AIMException('Unknown group ' + group_name)
+    
+    def group_dict_get(self, group_names):
+        groups = {}
+        for group_name in group_names:
+            try:
+                groups[group_name] = self.group_get(group_name)
+            except AIMException as e:
+                log.warning(e.message)
+        return groups
 
-    def hosts_add(self, host_name, groups, variables):
+    def hosts_create(self, host_name, group_names, variables):
         if host_name in self.hosts:
-            raise AIMException('Host %s already exists, can not add' % host_name)
-        host = Host(host_name, groups, variables, modified=True)
+            raise AIMException('Host %s already exists, can not create' % host_name)
+
+        groups = self.group_dict_get(group_names)
+        host = Host(host_name, groups, variables, created=True)
         self.add_or_set_variables(host, variables)
         self.hosts[host.name] = host
         self.modified = True
+
+        log.info('Host %s added' % host_name)
 
     def hosts_remove(self, host_name):
         host = self.hosts.get(host_name)
@@ -149,4 +169,6 @@ class Inventory(metaclass=Singleton):
 
         self.modified = True
         host.removed = True
+
+        log.info('Host %s removed' % host_name)
 

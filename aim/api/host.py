@@ -13,23 +13,30 @@
 # limitations under the License.
 
 import logging
+from aim.exceptions import AIMError
 
 log = logging.getLogger(__name__)
 
 class Host():
-    def __init__(self, name, groups, variables, modified=False):
+    def __init__(self, name, groups, variables, created=False):
         log.debug('Creating instance %s("%s")' % (type(self).__name__, name))
         self.type = 'HOST'
         self.name = name
         self.groups = groups
         self.variables = variables
-        self.modified = modified
+        self.modified = False
         self.removed = False
+        if created:
+            for group in self.groups.values():
+                group.hosts_add(self.name)
+            self.modified = True
         
     def save(self):
         if self.removed:
             log.debug('Removing instance %s("%s")' % (type(self).__name__, self.name))
+            #raise AIMError('Not implemented')
 
         elif self.modified:
             log.debug('Saving instance %s("%s")' % (type(self).__name__, self.name))
+            #raise AIMError('Not implemented')
 

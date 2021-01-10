@@ -20,18 +20,26 @@ from aim.api import Inventory
 
 log = logging.getLogger(__name__)
 
-class Add:
+class Create:
     @staticmethod
     def init_parser(parent_subparsers, parent_parser):
-        parser = parent_subparsers.add_parser('add',
+        parser = parent_subparsers.add_parser('create',
             parents=[parent_parser],
-            aliases=['create'],
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-            description='Add a new host',
-            help='Add a new host')
+            description='Create a new host',
+            help='Create a new host')
+        parser.add_argument('-g', '--group',
+            action='append',
+            help='Add the host to this group',
+            metavar='GROUP',
+            dest='groups')
+        parser.add_argument('-v', '--variable',
+            action='append',
+            help='Set variables at host level, as key=value or YAML/JSON, if filename prepend with @',
+            metavar='VARIABLE=VALUE',)
         parser.add_argument('host',
             metavar='HOST',
-            help='Name of the host to add')
+            help='Name of the host to create')
  
     def __init__(self, inventory, options):
-        inventory.hosts_add(options.host, {}, {})
+        inventory.hosts_create(options.host, options.groups, {})

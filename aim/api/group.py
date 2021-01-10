@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+from aim.exceptions import AIMError, AIMException
 
 log = logging.getLogger(__name__)
 
@@ -27,8 +28,27 @@ class Group():
         self.removed = False
 
     def save(self):
+        group_path = self.path / self.name
         if self.removed:
             log.debug('Removing instance %s("%s")' % (type(self).__name__, self.name))
+            group_path.unlink()
+            log.info('Group %s removed' % self.name)
 
         elif self.modified:
             log.debug('Saving instance %s("%s")' % (type(self).__name__, self.name))
+            with group_path.open(mode='w', encoding='utf-8') as f:
+                f.write('[%s]\n' % self.name)
+                for host in self.hosts.values():
+                    if not host.removed:
+                        f.write(host.name)
+                        f.write('\n')
+            log.info('Group %s saved' % self.name)
+
+    def hosts_add(self, host_name):
+        if host_name in self.hosts:
+            raise AIMException('Host %s already present in group %s, can not add' % (host_name, self.name))
+
+        self.hosts.append(host_name)
+        self.modified = True
+
+        log.info('Host %s added to group %s' % (host_name, self.name))

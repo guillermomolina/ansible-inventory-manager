@@ -17,14 +17,14 @@ import argparse
 import pathlib
 
 from aim.cli.host.list import List
-from aim.cli.host.add import Add
+from aim.cli.host.create import Create
 from aim.cli.host.remove import Remove
 from aim.util.argparse import get_subparser_aliases
 
 class Host:
     commands = {
         'ls': List,
-        'add': Add,
+        'create': Create,
         'rm': Remove
     }
 

@@ -15,6 +15,7 @@
 # Mutually exclusive host groups
 
 import logging
+from aim.exceptions import AIMError
 
 log = logging.getLogger(__name__)
 
@@ -32,9 +33,11 @@ class Category():
     def save(self):
         if self.removed:
             log.debug('Removing instance %s("%s")' % (type(self).__name__, self.name))
+            raise AIMError('Not implemented')
 
         elif self.modified:
             log.debug('Saving instance %s("%s")' % (type(self).__name__, self.name))
+            raise AIMError('Not implemented')
 
         for group in self.groups.values():
             group.save()
